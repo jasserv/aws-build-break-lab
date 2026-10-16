@@ -8,6 +8,7 @@ A containerized toolkit for practicing cloud infrastructure and security labs us
 - **Terraform**: Infrastructure as Code
 - **AWS CLI**: Interact with AWS-compatible APIs
 - **Docker**: Run tools in an isolated, consistent environment
+- **Docker Compose**: Start and connect the tools container and FLOCI simulator
 - **FLOCI**: Local AWS service simulator
 
 ## Prerequisites
@@ -17,7 +18,7 @@ A containerized toolkit for practicing cloud infrastructure and security labs us
 - Git
 - A running FLOCI simulator
 
-The current configuration expects the Docker network `awsfloci_default` and simulator hostname `awsfloci-floci-1`.
+You do not need to install Terraform or the AWS CLI directly on your host machine. Both are available inside the tools container.
 
 ## Getting Started
 
@@ -28,44 +29,23 @@ git clone https://github.com/jasserv/aws-build-break-lab.git
 cd aws-build-break-lab
 ```
 
-### 2. Verify Docker and FLOCI
-
-Check Docker:
-
-```bash
-docker --version
-docker compose version
-```
-
-Check the Docker network:
-
-```bash
-docker network ls
-```
-
-Check whether FLOCI responds:
-
-```bash
-curl http://localhost:4566
-```
-
-### 3. Build the Tools Image
+### 2. Build the Tools Image
 
 ```bash
 docker build -t build-break-tools:1.0 .
 ```
 
-This builds the Docker image containing Terraform and the AWS CLI.
+This builds the container image containing Terraform and the AWS CLI.
 
-### 4. Start the Tools Container
+### 3. Start the Lab
 
 ```bash
 ./lab.sh
 ```
 
-The script starts an interactive container with the repository mounted at `/workspace`.
+The script starts an interactive tools container and mounts the repository at `/workspace`. Docker Compose also starts the FLOCI simulator and connects both containers to the same Docker network.
 
-### 5. Verify the Installed Tools
+### 4. Verify the Installed Tools
 
 Inside the container, run:
 
@@ -74,75 +54,99 @@ terraform version
 aws --version
 ```
 
-To exit the container:
+The tools container uses the internal FLOCI endpoint:
+
+```text
+http://floci:4566
+```
+
+To leave the tools container, run:
 
 ```bash
 exit
 ```
 
+### 5. Run the Environment Checks
+
+From your host terminal, run:
+
+```bash
+./check/check.sh
+```
+
+This checks the local prerequisites and verifies that the FLOCI endpoint is responding.
+
 ## Configuration
 
-The tools container uses `compose.yaml` to configure:
+The lab's `compose.yaml` configures the tools container and FLOCI simulator, including:
 
 - The mounted project directory
-- AWS CLI profile settings
+- The internal Docker network
 - The default AWS region
-- The FLOCI endpoint
-- The Docker network used to reach FLOCI
+- The AWS CLI endpoint
+- The Terraform FLOCI endpoint
+- The location of local lab credentials
+- Environment settings that disable EC2 metadata credential lookups
 
-The current configuration expects FLOCI to be reachable inside the Docker network at:
+### FLOCI Endpoints
 
-`http://awsfloci-floci-1:4566`
+The endpoints differ depending on where you run your commands.
 
-If your FLOCI container or network uses a different name, update `compose.yaml` accordingly.
+| Location | Endpoint |
+|---|---|
+| Host machine | `http://localhost:4567` |
+| Tools container | `http://floci:4566` |
+
+Use the host endpoint when checking FLOCI from WSL or your host terminal. Commands executed inside the tools container use the internal service hostname.
+
+The Compose configuration manages the network between the containers, so you do not need to connect the lab to a separately named FLOCI container or an existing Docker network.
 
 ## Finding Experiments
 
-Experiments are organized into individual directories within this repository.
+Experiments are organized into numbered directories in the repository.
 
-### 1. Browse the Repository
-
-Visit the [AWS Build & Break Lab repository](https://github.com/jasserv/aws-build-break-lab) and look for directories numbered by experiment, such as `01-first-bucket`.
-
-Each experiment directory may contain:
-- `README.md` - Experiment objectives, instructions, and expected results.
-- `main.tf` - Terraform configuration for the experiment.
-- Supporting files and scripts required to run or reset the experiment.
-
-### 2. List Available Experiments
+### 1. Browse Available Experiments
 
 From the repository root, run:
 
 ```bash
 ls -d [0-9][0-9]-*/
-
-## Troubleshooting
-
-### Docker Network Not Found
-
-Ensure FLOCI is running and the expected Docker network exists:
-
-```bash
-docker network ls
 ```
 
-### FLOCI Connection Failure
+Example output:
 
-Verify that the simulator is running and that the endpoint and Docker network configuration are correct.
+```text
+01-first-bucket/
+```
 
-### AWS Credential Errors
+### 2. Inspect an Experiment
 
-Verify the configured AWS profile and credentials. Use simulator credentials for local labs rather than real AWS account credentials.
+Each experiment directory may contain:
 
-### Terraform Provider Download Errors
+- `README.md` — Objectives, instructions, and expected results.
+- `main.tf` — Terraform configuration.
+- `main.tf.good` — Known-good configuration used to restore the baseline.
+- `configure-reader.sh` — Configures the experiment's reader profile when applicable.
+- `reset-lab.sh` — Restores the experiment's known-good configuration.
+- Other scripts and files needed for testing.
 
-Check Docker's network connectivity and retry the initialization.
+Before starting an experiment, read its README and identify the resources it creates, the permissions it grants, and the expected outcomes.
+
+### Terraform State or Configuration Problems
+
+Read the experiment instructions before changing state or deleting files. If a reset script is provided, use it rather than manually deleting Terraform state.
 
 ## Security
 
 - Never commit real AWS credentials, access keys, or secrets.
-- Keep Terraform state files and local credentials out of version control.
-- Use the local simulator for experiments rather than production AWS resources.
+- Keep local credential files, Terraform state files, and generated plans out of version control.
+- Use the local simulator for experiments instead of production AWS resources.
+- Treat simulator credentials and local state as sensitive lab artifacts.
+- Review Terraform plans before applying infrastructure changes.
+
+## Project Goals
+
+This project is designed to make cloud learning repeatable and practical. The goal is to make it easier to set up the environment on another machine, spend less time repeating manual configuration, and focus more on building, breaking, troubleshooting, and understanding cloud infrastructure.
 
 ## License
 
