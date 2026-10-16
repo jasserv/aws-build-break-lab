@@ -1,0 +1,21 @@
+services:
+  lab-tools:
+    image: build-break-tools:1.0
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - ${HOME}/.aws:/root/.aws:ro
+    environment:
+      AWS_PROFILE: reader
+      AWS_EC2_METADATA_DISABLED: "true"
+      AWS_DEFAULT_REGION: ap-southeast-1
+      TF_VAR_floci_endpoint: "http://awsfloci-floci-1:4566"
+    networks:
+      - floci
+    stdin_open: true
+    tty: true
+
+networks:
+  floci:
+    external: true
+    name: awsfloci_default

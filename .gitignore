@@ -1,0 +1,23 @@
+
+# Terraform state and local working files
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Terraform variables that may contain secrets
+*.tfvars
+*.tfvars.json
+
+# AWS credentials
+.aws/
+credentials
+
+# Environment files
+.env
+.env.*
+
+# Python cache
+__pycache__/
+01-first-bucket/s3_iam_experiment1_popup.html
+01-first-bucket/test.txt
