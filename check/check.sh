@@ -29,8 +29,8 @@ else
 fi
 
 # FLOCI
-if curl -s --connect-timeout 2 http://localhost:4566 >/dev/null 2>&1; then
-    echo "✓ FLOCI        Running on localhost:4566"
+if curl -s --connect-timeout 2 http://localhost:4567 >/dev/null 2>&1; then
+    echo "✓ FLOCI        Running on localhost:4567"
 else
     echo "✗ FLOCI        Not running on localhost:4566"
 fi

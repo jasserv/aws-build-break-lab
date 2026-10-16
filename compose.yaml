@@ -1,21 +1,33 @@
 services:
+  floci:
+    image: floci/floci:latest
+    environment:
+      FLOCI_SERVICES_IAM_ENFORCEMENT_ENABLED: "true"
+    networks:
+      - lab-network
+    ports:
+      - "4567:4566"
+
   lab-tools:
     image: build-break-tools:1.0
     working_dir: /workspace
     volumes:
       - ./:/workspace
     environment:
+      FLOCI_SERVICES_IAM_ENFORCEMENT_ENABLED: "true"
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_DEFAULT_REGION: ap-southeast-1
-      AWS_ENDPOINT_URL: "http://awsfloci-floci-1:4566"
-      TF_VAR_floci_endpoint: "http://awsfloci-floci-1:4566"
+      AWS_ENDPOINT_URL: "http://floci:4566"
+      TF_VAR_floci_endpoint: "http://floci:4566"
       AWS_SHARED_CREDENTIALS_FILE: /workspace/.lab-aws/credentials
+      AWS_PAGER: ""
     networks:
+      - lab-network
+    depends_on:
       - floci
     stdin_open: true
     tty: true
 
 networks:
-  floci:
-    external: true
-    name: awsfloci_default
+  lab-network:
+    driver: bridge
