@@ -1,3 +1,10 @@
+# Local lab credentials
+.lab-aws/
+
+# Temporary test files
+test.txt
+01-first-bucket/denied-test.txt
+01-first-bucket/test-upload.txt
 
 # Terraform state and local working files
 **/.terraform/

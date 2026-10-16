@@ -2,6 +2,12 @@
 
 Intentionally break an AWS S3 IAM policy, observe the failure, and troubleshoot the root cause.
 
+terraform init
+terraform apply
+
+cd /workspace/01-first-bucket
+./configure-reader.sh
+
 ## Baseline Tests
 
 ```bash
