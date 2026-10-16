@@ -9,6 +9,7 @@ services:
       AWS_PROFILE: reader
       AWS_EC2_METADATA_DISABLED: "true"
       AWS_DEFAULT_REGION: ap-southeast-1
+      AWS_ENDPOINT_URL: "http://awsfloci-floci-1:4566"
       TF_VAR_floci_endpoint: "http://awsfloci-floci-1:4566"
     networks:
       - floci
