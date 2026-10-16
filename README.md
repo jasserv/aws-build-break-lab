@@ -96,6 +96,26 @@ The current configuration expects FLOCI to be reachable inside the Docker networ
 
 If your FLOCI container or network uses a different name, update `compose.yaml` accordingly.
 
+## Finding Experiments
+
+Experiments are organized into individual directories within this repository.
+
+### 1. Browse the Repository
+
+Visit the [AWS Build & Break Lab repository](https://github.com/jasserv/aws-build-break-lab) and look for directories numbered by experiment, such as `01-first-bucket`.
+
+Each experiment directory may contain:
+- `README.md` - Experiment objectives, instructions, and expected results.
+- `main.tf` - Terraform configuration for the experiment.
+- Supporting files and scripts required to run or reset the experiment.
+
+### 2. List Available Experiments
+
+From the repository root, run:
+
+```bash
+ls -d [0-9][0-9]-*/
+
 ## Troubleshooting
 
 ### Docker Network Not Found
